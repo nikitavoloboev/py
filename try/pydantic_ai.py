@@ -1,3 +1,5 @@
+# TODO: deps don't resolve in PyCharm
+# https://youtrack.jetbrains.com/issue/PY-78217/PyCharm-does-not-pick-up-venv-in-project
 from pydantic_ai import Agent, RunContext
 
 roulette_agent = Agent(
