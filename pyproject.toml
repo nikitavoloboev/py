@@ -6,6 +6,7 @@ readme = "readme.md"
 requires-python = ">=3.13"
 dependencies = [
     "logfire>=3.5.3",
+    "mlx>=0.23.0",
     "pydantic>=2.10.6",
     "pydantic-ai>=0.0.24",
     "python-dotenv>=1.0.0",
