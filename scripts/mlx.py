@@ -3,9 +3,6 @@ import mlx.core as mx
 
 
 async def main() -> None:
-    a = mx.array([1, 2, 3, 4])
-    print(a.shape)
-
     # Define a simple neural network model
     class Model:
         def __init__(self):
