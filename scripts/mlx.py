@@ -1,5 +1,31 @@
 import asyncio
+import json
 import mlx.core as mx
+
+
+def save_model(model, file_path):
+    """Save the model parameters to a JSON file."""
+    params = model.parameters()
+    param_dict = {
+        "w1": params[0].tolist(),
+        "b1": params[1].tolist(),
+        "w2": params[2].tolist(),
+        "b2": params[3].tolist(),
+    }
+    with open(file_path, "w") as f:
+        json.dump(param_dict, f)
+    print(f"Model saved to {file_path}")
+
+
+def load_model(model, file_path):
+    """Load model parameters from a JSON file and update the model."""
+    with open(file_path, "r") as f:
+        param_dict = json.load(f)
+    model.w1 = mx.array(param_dict["w1"])
+    model.b1 = mx.array(param_dict["b1"])
+    model.w2 = mx.array(param_dict["w2"])
+    model.b2 = mx.array(param_dict["b2"])
+    print(f"Model loaded from {file_path}")
 
 
 async def main() -> None:
@@ -56,6 +82,15 @@ async def main() -> None:
 
         if epoch % 10 == 0:
             print(f"Epoch {epoch}, Loss: {loss}")
+
+    # Save the trained model to a file
+    save_model(model, "model.json")
+
+    # To demonstrate loading, you could create a new model and load the parameters
+    new_model = Model()
+    load_model(new_model, "model.json")
+    # Optionally, verify that new_model produces similar outputs:
+    print("New model output:", new_model(x_train[:5]))
 
 
 if __name__ == "__main__":
