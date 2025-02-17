@@ -24,4 +24,8 @@ past-*
 .repo_ignore
 
 __pycache__
-model.json
+*.py[oc]
+build
+wheels
+*.egg-info
+.venv
