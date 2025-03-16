@@ -22,6 +22,7 @@ past-*
 *.bike
 *.db
 .repo_ignore
+x/
 
 __pycache__
 *.py[oc]
