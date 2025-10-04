@@ -1,0 +1,93 @@
+version: '3'
+
+vars:
+  uv_bin: '{{default "uv" .UV_BIN}}'
+  python_spec: '{{default "3.13" .PYTHON_SPEC}}'
+  bin_dir: '{{if .BIN_DIR}}{{.BIN_DIR}}{{else}}{{.HOME}}/bin{{end}}'
+  bin_name: '{{default "flow-py" .BIN_NAME}}'
+
+tasks:
+  default:
+    desc: List available tasks.
+    silent: true
+    cmds:
+      - task --list
+
+  setup:
+    desc: Ensure uv-managed Python is available, then install dependencies.
+    silent: true
+    deps:
+      - task: .ensure-tools
+    cmds:
+      - |
+        set -euo pipefail
+        export UV_PYTHON="${UV_PYTHON:-{{.python_spec}}}"
+        set +e
+        uv_output="$({{.uv_bin}} sync --python '{{.python_spec}}' 2>&1)"
+        status=$?
+        set -e
+        if [ $status -ne 0 ]; then
+          printf '%s\n' "$uv_output" >&2
+          exit $status
+        fi
+        echo "✔️ you are setup"
+
+  flow:
+    desc: Run the Flow CLI (passes CLI args through).
+    silent: true
+    deps:
+      - task: .ensure-tools
+    cmds:
+      - |
+        set -euo pipefail
+        export UV_PYTHON="${UV_PYTHON:-{{.python_spec}}}"
+        {{.uv_bin}} run --python '{{.python_spec}}' -m cli.flow{{if .CLI_ARGS}} {{.CLI_ARGS}}{{end}}
+
+  dev:
+    desc: Alias for `task flow`.
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        task flow{{if .CLI_ARGS}} -- {{.CLI_ARGS}}{{end}}
+
+  run:
+    desc: Alias for `task flow`.
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        task flow{{if .CLI_ARGS}} -- {{.CLI_ARGS}}{{end}}
+
+  deploy:
+    desc: Install a wrapper script that runs the Flow CLI through uv.
+    silent: true
+    deps:
+      - task: .ensure-tools
+    cmds:
+      - |
+        set -euo pipefail
+        install_path="{{.bin_dir}}/{{.bin_name}}"
+        mkdir -p "{{.bin_dir}}"
+        tmp_file="$(mktemp "${TMPDIR:-/tmp}/flow-wrapper.XXXXXX")"
+        printf '%s\n' '#!/usr/bin/env bash' \
+          'set -euo pipefail' \
+          'exec "{{.uv_bin}}" run --python '\''{{.python_spec}}'\'' -m cli.flow "$@"' \
+          > "$tmp_file"
+        mv "$tmp_file" "$install_path"
+        chmod 755 "$install_path"
+        echo "Installed CLI to $install_path"
+
+  .ensure-tools:
+    internal: true
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        uv_bin="{{.uv_bin}}"
+        if ! command -v "$uv_bin" >/dev/null 2>&1; then
+          echo "uv executable '$uv_bin' not found in PATH."
+          echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+          exit 1
+        fi
+        "$uv_bin" --version >/dev/null

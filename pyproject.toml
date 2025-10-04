@@ -1,0 +1,22 @@
+[project]
+name = "py"
+version = "0.1.0"
+description = ""
+readme = "readme.md"
+requires-python = ">=3.13"
+dependencies = [
+    "logfire>=3.5.3",
+    "mlx>=0.23.0",
+    "numpy>=2.2.5",
+    "pydantic>=2.10.6",
+    "pydantic-ai>=0.0.24",
+    "python-dotenv>=1.0.0",
+    "safetensors>=0.5.2",
+    "torch>=2.6.0",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.9.4"]
+
+[project.scripts]
+flow = "cli.flow.__main__:entrypoint"
