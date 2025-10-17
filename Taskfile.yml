@@ -6,7 +6,7 @@ vars:
   bin_dir: '{{if .BIN_DIR}}{{.BIN_DIR}}{{else}}{{.HOME}}/bin{{end}}'
   bin_name: '{{default "flow-py" .BIN_NAME}}'
   script_runner_bin_name: '{{default "py-scripts" .SCRIPT_RUNNER_BIN_NAME}}'
-  flow_alias_names: '{{if .FLOW_ALIAS_NAMES}}{{.FLOW_ALIAS_NAMES}}{{else}}ff{{end}}'
+  flow_alias_names: '{{if .FLOW_ALIAS_NAMES}}{{.FLOW_ALIAS_NAMES}}{{else}}fa{{end}}'
 
 tasks:
   default:

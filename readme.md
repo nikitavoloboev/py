@@ -26,6 +26,10 @@ py-scripts --list     # just list available scripts
 
 `flow` is a CLI as a dump of various commands written in Python that are useful to me. See [cli/flow](cli/flow) for its code/docs.
 
+Run `task deploy` to install `flow-py` into PATH. It also puts `fa` command in path (my own personal shorthand, but you can change it).
+
+Invoking `flow`, `flow-py`, or `fa` with no arguments opens a fuzzy command palette so you can quickly pick from any registered commands.
+
 ## Contributing
 
 Any PR to improve is welcome. [codex](https://github.com/openai/codex) & [cursor](https://cursor.com) are nice for dev. Great **working** & **useful** patches are most appreciated (ideally).
