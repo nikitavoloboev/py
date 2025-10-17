@@ -5,6 +5,8 @@ vars:
   python_spec: '{{default "3.13" .PYTHON_SPEC}}'
   bin_dir: '{{if .BIN_DIR}}{{.BIN_DIR}}{{else}}{{.HOME}}/bin{{end}}'
   bin_name: '{{default "flow-py" .BIN_NAME}}'
+  script_runner_bin_name: '{{default "py-scripts" .SCRIPT_RUNNER_BIN_NAME}}'
+  flow_alias_names: '{{if .FLOW_ALIAS_NAMES}}{{.FLOW_ALIAS_NAMES}}{{else}}ff{{end}}'
 
 tasks:
   default:
@@ -77,6 +79,26 @@ tasks:
         mv "$tmp_file" "$install_path"
         chmod 755 "$install_path"
         echo "Installed CLI to $install_path"
+        for alias_name in {{.flow_alias_names}}; do
+          alias_path="{{.bin_dir}}/$alias_name"
+          tmp_alias_file="$(mktemp "${TMPDIR:-/tmp}/flow-alias.XXXXXX")"
+          printf '%s\n' '#!/usr/bin/env bash' \
+            'set -euo pipefail' \
+            'exec "{{.uv_bin}}" run --python '\''{{.python_spec}}'\'' -m cli.flow "$@"' \
+            > "$tmp_alias_file"
+          mv "$tmp_alias_file" "$alias_path"
+          chmod 755 "$alias_path"
+          echo "Installed CLI alias to $alias_path"
+        done
+        scripts_install_path="{{.bin_dir}}/{{.script_runner_bin_name}}"
+        tmp_scripts_file="$(mktemp "${TMPDIR:-/tmp}/scripts-wrapper.XXXXXX")"
+        printf '%s\n' '#!/usr/bin/env bash' \
+          'set -euo pipefail' \
+          'exec "{{.uv_bin}}" run --python '\''{{.python_spec}}'\'' -m cli.scripts_cli "$@"' \
+          > "$tmp_scripts_file"
+        mv "$tmp_scripts_file" "$scripts_install_path"
+        chmod 755 "$scripts_install_path"
+        echo "Installed scripts CLI to $scripts_install_path"
 
   .ensure-tools:
     internal: true

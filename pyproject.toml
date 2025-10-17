@@ -20,3 +20,4 @@ dev = ["ruff>=0.9.4"]
 
 [project.scripts]
 flow = "cli.flow.__main__:entrypoint"
+py-scripts = "cli.scripts_cli.__main__:entrypoint"
