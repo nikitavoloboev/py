@@ -61,6 +61,28 @@ tasks:
         set -euo pipefail
         task flow{{if .CLI_ARGS}} -- {{.CLI_ARGS}}{{end}}
 
+  api:
+    desc: Start the FastAPI development server with reload.
+    silent: true
+    deps:
+      - task: .ensure-tools
+    cmds:
+      - |
+        set -euo pipefail
+        export UV_PYTHON="${UV_PYTHON:-{{.python_spec}}}"
+        {{.uv_bin}} run --python '{{.python_spec}}' uvicorn server.app:app --reload --reload-dir server{{if .CLI_ARGS}} {{.CLI_ARGS}}{{end}}
+
+  snapvision:
+    desc: Run the SnapVision CLI (passes CLI args through).
+    silent: true
+    deps:
+      - task: .ensure-tools
+    cmds:
+      - |
+        set -euo pipefail
+        export UV_PYTHON="${UV_PYTHON:-{{.python_spec}}}"
+        {{.uv_bin}} run --python '{{.python_spec}}' -m cli.snapvision{{if .CLI_ARGS}} {{.CLI_ARGS}}{{end}}
+
   deploy:
     desc: Install a wrapper script that runs the Flow CLI through uv.
     silent: true

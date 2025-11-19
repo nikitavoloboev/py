@@ -1,0 +1,101 @@
+version = 1
+
+[[tasks]]
+name = "setup"
+command = """
+set -euo pipefail
+uv_bin="${UV_BIN:-uv}"
+python_spec="${PYTHON_SPEC:-3.13}"
+
+if ! command -v "$uv_bin" >/dev/null 2>&1; then
+  echo "uv executable '$uv_bin' not found in PATH."
+  echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+  exit 1
+fi
+
+"$uv_bin" --version >/dev/null
+export UV_PYTHON="${UV_PYTHON:-$python_spec}"
+
+set +e
+uv_output="$("$uv_bin" sync --python "$python_spec" 2>&1)"
+status=$?
+set -e
+
+if [ $status -ne 0 ]; then
+  printf '%s\n' "$uv_output" >&2
+  exit $status
+fi
+
+echo "✔️ you are setup"
+"""
+description = "Ensure uv-managed Python is available and install dependencies."
+
+[[tasks]]
+name = "dev"
+command = """
+set -euo pipefail
+uv_bin="${UV_BIN:-uv}"
+python_spec="${PYTHON_SPEC:-3.13}"
+
+if ! command -v "$uv_bin" >/dev/null 2>&1; then
+  echo "uv executable '$uv_bin' not found in PATH."
+  echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+  exit 1
+fi
+
+export UV_PYTHON="${UV_PYTHON:-$python_spec}"
+"$uv_bin" run --python "$python_spec" -m cli.flow "$@"
+"""
+description = "Run the Flow CLI (passes CLI args through)."
+
+[[tasks]]
+name = "snapvision"
+command = """
+set -euo pipefail
+uv_bin="${UV_BIN:-uv}"
+python_spec="${PYTHON_SPEC:-3.13}"
+
+if ! command -v "$uv_bin" >/dev/null 2>&1; then
+  echo "uv executable '$uv_bin' not found in PATH."
+  echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+  exit 1
+fi
+
+export UV_PYTHON="${UV_PYTHON:-$python_spec}"
+"$uv_bin" run --python "$python_spec" -m cli.snapvision "$@"
+"""
+description = "Quickly run the SnapVision CLI (passes CLI args through)."
+
+[[tasks]]
+name = "uv-upgrade"
+command = """
+set -euo pipefail
+uv_bin="${UV_BIN:-uv}"
+
+if ! command -v "$uv_bin" >/dev/null 2>&1; then
+  echo "uv executable '$uv_bin' not found in PATH."
+  echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+  exit 1
+fi
+
+"$uv_bin" self update "$@"
+"""
+description = "Update the uv CLI to the latest available version."
+
+[[tasks]]
+name = "mlx-model-install"
+command = """
+set -euo pipefail
+uv_bin="${UV_BIN:-uv}"
+python_spec="${PYTHON_SPEC:-3.13}"
+
+if ! command -v "$uv_bin" >/dev/null 2>&1; then
+  echo "uv executable '$uv_bin' not found in PATH."
+  echo "Install uv from https://docs.astral.sh/uv/getting-started/installation/"
+  exit 1
+fi
+
+export UV_PYTHON="${UV_PYTHON:-$python_spec}"
+"$uv_bin" run --python "$python_spec" python mlx-model-install.py "$@"
+"""
+description = "Launch the TUI helper to download MLX models."
